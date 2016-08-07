@@ -1,7 +1,7 @@
 db:
   image: mysql
   volumes:
-    - ./data/piwik/db:/var/lib/mysql
+    - ".data/piwik/db:/var/lib/mysql"
   environment:
     MYSQL_ROOT_PASSWORD: malakas
 app:
@@ -9,9 +9,9 @@ app:
   links:
     - db
   volumes:
-    - ./data/piwik/config:/var/www/html/config
-    - ./data/piwik/ssmtp.conf:/etc/ssmtp/ssmtp.conf
-    - ./data/piwik/revaliases:/etc/ssmtp/revaliases
+    - ".data/piwik/config:/var/www/html/config"
+    - ./ssmtp.conf:/etc/ssmtp/ssmtp.conf
+    - ./revaliases:/etc/ssmtp/revaliases
 web:
   image: nginx
   volumes:
@@ -53,7 +53,7 @@ db2:
 wordpress:
   image: wordpress:latest
   volumes:
-    - ".data/wordpress/www/:/var/www/html"
+    - ".data/wordpress:/var/www/html"
   links:
     - db2
     - web

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PIWIK_PATH="../.data/piwik"
+PIWIK_PATH="."
 
 #Create .data folder with piwik required stuff
 if [ ! -f  ${PIWIK_PATH} ]; then
