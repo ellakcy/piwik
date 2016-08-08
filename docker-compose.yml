@@ -54,7 +54,10 @@ services:
     - './conf/nginx/conf.d:/etc/nginx/conf.d:ro'
     ports:
     - '8080:80'
+    - '8081:8081'
     links:
+    - piwik
     - wordpress
     volumes_from:
+    - piwik
     - wordpress
