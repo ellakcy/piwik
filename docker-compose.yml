@@ -8,18 +8,18 @@ services:
       MYSQL_ROOT_PASSWORD: $PIWIK_MYSQL_ROOT_PASSWORD
   piwik:
     image: piwik
-    links:
-    - piwik-db
     volumes:
     - './data/piwik/config:/var/www/html/config'
     - './ssmtp.conf:/etc/ssmtp/ssmtp.conf'
     - './revaliases:/etc/ssmtp/revaliases'
-  piwik-cron:
-    image: piwik
     links:
     - piwik-db
+  piwik-cron:
+    image: piwik
     volumes_from:
     - piwik
+    links:
+    - piwik-db
     entrypoint: |
       bash -c 'bash -s <<EOF
       trap "break;exit" SIGHUP SIGINT SIGTERM
@@ -47,17 +47,23 @@ services:
       WORDPRESS_DB_HOST: wordpress-db:/var/run/mysqld/mysqld.sock
       WORDPRESS_DB_USER: $WORDPRESS_MYSQL_USER
       WORDPRESS_DB_PASSWORD: $WORDPRESS_MYSQL_PASSWORD
-  nginx:
+  serve-piwik:
     image: nginx
     volumes:
-    - './conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
-    - './conf/nginx/conf.d:/etc/nginx/conf.d:ro'
+    - './conf/nginx/nginx-piwik.conf:/etc/nginx/nginx.conf:ro'
     ports:
-    - '8080:80'
     - '8081:8081'
     links:
     - piwik
+    volumes_from:
+    - piwik:ro
+  serve-wordpress:
+    image: nginx
+    volumes:
+    - './conf/nginx/nginx-wordpress.conf:/etc/nginx/nginx.conf:ro'
+    ports:
+    - '8080:80'
+    links:
     - wordpress
     volumes_from:
-    - piwik
-    - wordpress
+    - wordpress:ro
