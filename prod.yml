@@ -1,0 +1,8 @@
+version: '2'
+services:
+  serve-piwik:
+    ports:
+    - '8081:8081'
+  serve-wordpress:
+    ports:
+    - '80:80'

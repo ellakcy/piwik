@@ -1,0 +1,14 @@
+version: '2'
+services:
+  wordpress-db:
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+  wordpress:
+    environment:
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+  serve-wordpress:
+    ports:
+    - '8080:80'

@@ -1,0 +1,42 @@
+version: '2'
+services:
+  piwik-db:
+    image: mariadb
+    volumes:
+    - './data/piwik/db:/var/lib/mysql'
+    environment:
+      MYSQL_ROOT_PASSWORD: $PIWIK_DB_ROOT_PASSWORD
+  piwik:
+    image: piwik
+    volumes:
+    - './data/piwik/config:/var/www/html/config'
+    - './ssmtp.conf:/etc/ssmtp/ssmtp.conf'
+    - './revaliases:/etc/ssmtp/revaliases'
+    depends_on:
+    - piwik-db
+    links:
+    - piwik-db
+  piwik-cron:
+    image: piwik
+    volumes_from:
+    - piwik
+    depends_on:
+    - piwik-db
+    links:
+    - piwik-db
+    entrypoint: |
+      bash -c 'bash -s <<EOF
+      trap "break;exit" SIGHUP SIGINT SIGTERM
+      while /bin/true; do
+        su -s "/bin/bash" -c "/usr/local/bin/php /var/www/html/console core:archive" www-data
+        sleep 3600
+      done
+      EOF'
+  serve-piwik:
+    image: nginx
+    volumes:
+    - './conf/nginx/nginx-piwik.conf:/etc/nginx/nginx.conf:ro'
+    links:
+    - piwik
+    volumes_from:
+    - piwik:ro

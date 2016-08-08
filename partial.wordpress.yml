@@ -1,0 +1,31 @@
+version: '2'
+services:
+  wordpress-db:
+    image: mariadb
+    volumes:
+    - './data/wordpress/db:/var/lib/mysql'
+    environment:
+      MYSQL_ROOT_PASSWORD: $WORDPRESS_DB_ROOT_PASSWORD
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: $WORDPRESS_DB_USER
+      MYSQL_PASSWORD: $WORDPRESS_DB_PASSWORD
+  wordpress:
+    image: wordpress:fpm
+    volumes:
+    - './data/wordpress/www:/var/www/html'
+    depends_on:
+    - wordpress-db
+    links:
+    - wordpress-db
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db:/var/run/mysqld/mysqld.sock
+      WORDPRESS_DB_USER: $WORDPRESS_DB_USER
+      WORDPRESS_DB_PASSWORD: $WORDPRESS_DB_PASSWORD
+  serve-wordpress:
+    image: nginx
+    volumes:
+    - './conf/nginx/nginx-wordpress.conf:/etc/nginx/nginx.conf:ro'
+    links:
+    - wordpress
+    volumes_from:
+    - wordpress:ro
