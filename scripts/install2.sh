@@ -83,12 +83,12 @@ COMMAND="env PIWIK_MYSQL_ROOT_PASSWORD=${PIWIK_MYSQL_ROOT_PASSWORD} WORDPRESS_MY
 STARTUP_SCRIPT_PATH="${SCRIPT_PATH}/start.sh"
 STOP_SCRIPT_PATH="${SCRIPT_PATH}/stop.sh"
 
-echo $COMMAND." up -d" > ${STARTUP_SCRIPT_PATH}
+echo $COMMAND" up -d" > ${STARTUP_SCRIPT_PATH}
 chmod u+x ${STARTUP_SCRIPT_PATH}
 
 cecho "Startup script generated" $green
 
-echo $COMMAND." stop " > ${STOP_SCRIPT_PATH}
+echo $COMMAND" stop " > ${STOP_SCRIPT_PATH}
 chmod u+x ${STOP_SCRIPT_PATH}
 
 cecho "Stop script generated" $green

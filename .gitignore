@@ -3,5 +3,5 @@ ssmtp.conf
 revaliases
 data
 config
-./start.sh
-./stop.sh
+start.sh
+stop.sh
