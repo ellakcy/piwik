@@ -1,5 +1,6 @@
 version: '2'
 services:
+  
   piwik-db:
     image: mariadb
     volumes:
@@ -9,19 +10,19 @@ services:
 
   piwik:
     image: piwik
-    volumes:
-    - './data/piwik/config:/var/www/html/config'
-    - './ssmtp.conf:/etc/ssmtp/ssmtp.conf'
-    - './revaliases:/etc/ssmtp/revaliases'
     links:
-    - piwik-db
+     - piwik-db
+    volumes:
+     - './data/piwik/config:/var/www/html/config'
+     - './ssmtp.conf:/etc/ssmtp/ssmtp.conf'
+     - './revaliases:/etc/ssmtp/revaliases'
 
   piwik-cron:
     image: piwik
-    volumes_from:
-    - piwik
     links:
-    - piwik-db
+     - piwik-db
+    volumes_from:
+     - piwik
     entrypoint: |
       bash -c 'bash -s <<EOF
       trap "break;exit" SIGHUP SIGINT SIGTERM
@@ -72,4 +73,4 @@ services:
     links:
     - wordpress
     volumes_from:
-    - wordpress:ro
+    - wordpress
