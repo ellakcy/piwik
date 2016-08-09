@@ -78,7 +78,23 @@ read -p "Insert a password for database ROOT user: " WORDPRESS_MYSQL_ROOT_PASSWO
 read -p "Insert a username for a NEW database user that wordpresss will use for connection: " WORDPRESS_MYSQL_USER
 read -p "Insert a password for the user created above: " WORDPRESS_MYSQL_PASSWORD
 
-echo "env PIWIK_MYSQL_ROOT_PASSWORD=${PIWIK_MYSQL_ROOT_PASSWORD} WORDPRESS_MYSQL_ROOT_PASSWORD=${WORDPRESS_MYSQL_ROOT_PASSWORD} WORDPRESS_MYSQL_USER=${WORDPRESS_MYSQL_USER} WORDPRESS_MYSQL_PASSWORD=${WORDPRESS_MYSQL_PASSWORD} docker compose -up -d" > $SCRIPT_PATH/start.sh
-chmod u+x $SCRIPT_PATH/start.sh
+COMMAND="env PIWIK_MYSQL_ROOT_PASSWORD=${PIWIK_MYSQL_ROOT_PASSWORD} WORDPRESS_MYSQL_ROOT_PASSWORD=${WORDPRESS_MYSQL_ROOT_PASSWORD} WORDPRESS_MYSQL_USER=${WORDPRESS_MYSQL_USER} WORDPRESS_MYSQL_PASSWORD=${WORDPRESS_MYSQL_PASSWORD} docker-compose" > $SCRIPT_PATH/start.sh
 
-cecho "Startup script ggenerated" $green
+STARTUP_SCRIPT_PATH="${SCRIPT_PATH}/start.sh"
+STOP_SCRIPT_PATH="${SCRIPT_PATH}/stop.sh"
+
+echo $COMMAND." up -d" > ${STARTUP_SCRIPT_PATH}
+chmod u+x ${STARTUP_SCRIPT_PATH}
+
+cecho "Startup script generated" $green
+
+echo $COMMAND." stop " > ${STOP_SCRIPT_PATH}
+chmod u+x ${STOP_SCRIPT_PATH}
+
+cecho "Stop script generated" $green
+
+echo "In order to start up the service run: "
+cecho "${STARTUP_SCRIPT_PATH}" $green
+
+echo "You can stop the services via:"
+cecho "${STOP_SCRIPT_PATH}" $green
