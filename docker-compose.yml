@@ -1,6 +1,6 @@
 version: '2'
 services:
-  
+
   piwik-db:
     image: mariadb
     volumes:
@@ -43,15 +43,20 @@ services:
       MYSQL_PASSWORD: $WORDPRESS_MYSQL_PASSWORD
 
   wordpress:
-    image: wordpress:fpm
+    image: ellakcy/wordpressswithplugins
     volumes:
-    - './data/wordpress/www:/var/www/html'
+      - './data/wordpress/www:/var/www/html'
+    ports:
+      - '8080:80'
     links:
-    - wordpress-db
+      - wordpress-db
     environment:
       WORDPRESS_DB_HOST: wordpress-db:/var/run/mysqld/mysqld.sock
       WORDPRESS_DB_USER: $WORDPRESS_MYSQL_USER
       WORDPRESS_DB_PASSWORD: $WORDPRESS_MYSQL_PASSWORD
+      WORDPRESS_ADMIN_USER: $WORDPRESS_ADMIN_USER
+      WORDPRESS_ADMIN_PASSWORD: $WORDPRESS_ADMIN_PASSWORD
+      WORDPRESS_URL: http://0.0.0.0:8080
 
   serve-piwik:
     image: nginx
@@ -63,14 +68,3 @@ services:
     - piwik
     volumes_from:
     - piwik:ro
-    
-  serve-wordpress:
-    image: nginx
-    volumes:
-    - './conf/nginx/nginx-wordpress.conf:/etc/nginx/nginx.conf:ro'
-    ports:
-    - '8080:80'
-    links:
-    - wordpress
-    volumes_from:
-    - wordpress
