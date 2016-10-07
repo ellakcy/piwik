@@ -77,10 +77,15 @@ cecho "Setting up wordpress' database settings" $magenta
 read -p "Insert a password for database ROOT user: " WORDPRESS_MYSQL_ROOT_PASSWORD
 read -p "Insert a username for a NEW database user that wordpresss will use for connection: " WORDPRESS_MYSQL_USER
 read -p "Insert a password for the DATABASE user created above: " WORDPRESS_MYSQL_PASSWORD
-read -p "Insert a username for the WORDPRESS' admin user." WORDPRESS_ADMIN_USER
-read -p "Insert a password for the WORDPRESS' admin user." WORDPRESS_ADMIN_PASSWORD
 
-COMMAND="env PIWIK_MYSQL_ROOT_PASSWORD=\"${PIWIK_MYSQL_ROOT_PASSWORD}\" WORDPRESS_MYSQL_ROOT_PASSWORD=\"${WORDPRESS_MYSQL_ROOT_PASSWORD}\" WORDPRESS_MYSQL_USER=\"${WORDPRESS_MYSQL_USER}\" WORDPRESS_MYSQL_PASSWORD=\"${WORDPRESS_MYSQL_PASSWORD}\" WORDPRESS_ADMIN_USER=\"${WORDPRESS_ADMIN_USER}\" WORDPRESS_ADMIN_PASSWORD=\"${WORDPRESS_ADMIN_PASSWORD}\" docker-compose"
+cecho "Setting up wordpress' site settings" $magenta
+
+read -p "Insert a username for the WORDPRESS' admin user: " WORDPRESS_ADMIN_USER
+read -p "Insert a password for the WORDPRESS' admin user: " WORDPRESS_ADMIN_PASSWORD
+read -p "Insert a password for the WORDPRESS' admin user: " WORDPRESS_URL
+
+
+COMMAND="env PIWIK_MYSQL_ROOT_PASSWORD=\"${PIWIK_MYSQL_ROOT_PASSWORD}\" WORDPRESS_MYSQL_ROOT_PASSWORD=\"${WORDPRESS_MYSQL_ROOT_PASSWORD}\" WORDPRESS_MYSQL_USER=\"${WORDPRESS_MYSQL_USER}\" WORDPRESS_MYSQL_PASSWORD=\"${WORDPRESS_MYSQL_PASSWORD}\" WORDPRESS_ADMIN_USER=\"${WORDPRESS_ADMIN_USER}\" WORDPRESS_ADMIN_PASSWORD=\"${WORDPRESS_ADMIN_PASSWORD}\" WORDPRESS_URL=\"${WORDPRESS_URL}\" docker-compose"
 
 STARTUP_SCRIPT_PATH="${SCRIPT_PATH}/start.sh"
 STOP_SCRIPT_PATH="${SCRIPT_PATH}/stop.sh"
