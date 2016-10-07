@@ -77,8 +77,6 @@ cecho "Setting up wordpress' database settings" $magenta
 read -p "Insert a password for database ROOT user: " WORDPRESS_MYSQL_ROOT_PASSWORD
 read -p "Insert a username for a NEW database user that wordpresss will use for connection: " WORDPRESS_MYSQL_USER
 read -p "Insert a password for the DATABASE user created above: " WORDPRESS_MYSQL_PASSWORD
-read -p "Insert a username for the WORDPRESS' admin user." WORDPRESS_ADMIN_USER
-read -p "Insert a password for the WORDPRESS' admin user." WORDPRESS_ADMIN_PASSWORD
 
 cecho "Setting up wordpress' site settings" $magenta
 
