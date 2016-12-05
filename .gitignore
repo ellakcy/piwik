@@ -5,3 +5,5 @@ data
 config
 start.sh
 stop.sh
+backup.sh
+backup
