@@ -1,6 +1,7 @@
 version: '2'
 services:
-
+  
+#Piwik
   piwik-db:
     image: mariadb
     volumes:
@@ -32,6 +33,18 @@ services:
       done
       EOF'
 
+  serve-piwik:
+    image: nginx
+    volumes:
+    - './conf/nginx/nginx-piwik.conf:/etc/nginx/nginx.conf:ro'
+    ports:
+    - '8081:8081'
+    links:
+    - piwik
+    volumes_from:
+    - piwik:ro
+
+#Wordpress
   wordpress-db:
     image: mariadb
     volumes:
@@ -58,14 +71,3 @@ services:
       WORDPRESS_ADMIN_PASSWORD: $WORDPRESS_ADMIN_PASSWORD
       WORDPRESS_URL: $WORDPRESS_URL
       WORDPRESS_VERSION: 4.6.1
-
-  serve-piwik:
-    image: nginx
-    volumes:
-    - './conf/nginx/nginx-piwik.conf:/etc/nginx/nginx.conf:ro'
-    ports:
-    - '8081:8081'
-    links:
-    - piwik
-    volumes_from:
-    - piwik:ro
