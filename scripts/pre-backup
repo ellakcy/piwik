@@ -1,5 +1,151 @@
-#!/bin/bash -eux
-URL=${PWD##*/}
-db_container_name=`echo ${URL}_db_1 | sed "s/\.//g" | sed "s/-//g"`; \
+#!/bin/bash
 
-docker exec $db_container_name bash -c 'mysqldump --skip-lock-tables --single-transaction --all-databases --events -uroot -p$MYSQL_ROOT_PASSWORD' | gzip -9 >  ./mysql/piwik_$(date +%Y%d%mT%H%M).sql.gz
+# Printing functions
+black='\E[30;40m'
+red='\E[31;40m'
+green='\E[32;40m'
+yellow='\E[33;40m'
+blue='\E[34;40m'
+magenta='\E[35;40m'
+cyan='\E[36;40m'
+white='\E[37;40m'
+
+#Echo a string with color
+cecho ()                     # Color-echo.
+                             # Argument $1 = message
+                             # Argument $2 = color
+{
+local default_msg="No message passed."
+                             # Doesn't really need to be a local variable.
+
+message=${1:-$default_msg}   # Defaults to default message.
+color=${2:-$black}           # Defaults to black, if not specified.
+
+  echo -e "$color"
+  echo "$message"
+  tput sgr0                      # Reset to normal.
+
+  return
+}
+
+#Echo a string as error with color
+cecho_err ()                     # Color-echo.
+                             # Argument $1 = message
+                             # Argument $2 = color
+{
+local default_msg="No message passed."
+                             # Doesn't really need to be a local variable.
+
+message=${1:-$default_msg}   # Defaults to default message.
+color=${2:-$red}           # Defaults to black, if not specified.
+
+  echo >&2 -e "$color"
+  echo >&2 "$message"
+  tput sgr0                      # Reset to normal.
+
+  return
+}
+
+#Method that creates a non existing folder
+create_folder_if_not_exists()
+{
+  folder=${1}
+  if [ ! -f $folder ] ; then
+    cecho "Folder \"${folder}\" does not exist creating" $magenta
+    mkdir -p ${folder}
+  fi
+
+  return
+}
+
+# Method that back ups all the databases
+backupdb()
+{
+
+  #Container id that runs mysql
+  container_id=${1}
+
+  #Path that the dump will be stored
+  path_to_store=${2}
+  create_folder_if_not_exists ${path_to_store}
+
+  #Database user
+  user=${3}
+  #Database password
+  password=${4}
+
+  dump_command="mysqldump --skip-lock-tables --single-transaction --all-databases --events -u${user} -p${password}"
+  docker exec ${container_id} bash -c "${dump_command}" > "${path_to_store}/${container_id}.sql"
+
+  return
+}
+
+URL=${PWD##*/}
+db_container_name=`echo ${URL} | sed "s/\.//g" | sed "s/-//g"`;
+
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+
+#Current date
+now=$(date +%Y%d%mT%H%M)
+
+cecho "Backing up piwik + wordpress solution" $cyan
+
+backup_folder="${ABSOLUTE_PATH}/../backup/${now}"
+create_folder_if_not_exists ${backup_folder}
+
+cecho "Backing up wordpress" $cyan
+
+wordpress_container=$(docker ps | grep "${db_container_name}_wordpress-db" | awk '{print $1}')
+wordpress_backup_folder="${backup_folder}/wordpress"
+
+cecho "Backing up database" $magenta
+backupdb "${wordpress_container}" "${wordpress_backup_folder}/db" ${WORDPRESS_MYSQL_USER} ${WORDPRESS_MYSQL_PASSWORD}
+
+cecho "Backing up files" $magenta
+create_folder_if_not_exists "${wordpress_backup_folder}/data"
+cp -r "${ABSOLUTE_PATH}/../data/wordpress/www" "${wordpress_backup_folder}/data"
+
+cecho "Backing up environment" $magenta
+
+echo "" > ${wordpress_backup_folder}/env.txt
+echo "WORDPRESS_MYSQL_ROOT_PASSWORD=${WORDPRESS_MYSQL_ROOT_PASSWORD}" >> ${wordpress_backup_folder}/env.txt
+echo "WORDPRESS_MYSQL_USER=${WORDPRESS_MYSQL_USER}">> ${wordpress_backup_folder}/env.txt
+echo "WORDPRESS_MYSQL_PASSWORD=${WORDPRESS_MYSQL_PASSWORD}" >> ${wordpress_backup_folder}/env.txt
+echo "WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER}" >> ${wordpress_backup_folder}/env.txt
+echo "WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}" >> ${wordpress_backup_folder}/env.txt
+echo "WORDPRESS_URL=${WORDPRESS_URL}" >> ${wordpress_backup_folder}/env.txt
+
+
+cecho "Backing up piwik" $cyan
+
+piwik_container=$(docker ps | grep "${db_container_name}_piwik-db" | awk '{print $1}')
+piwik_backup_folder="${backup_folder}/piwik"
+
+cecho "Backing up database" $magenta
+backupdb $piwik_container "${piwik_backup_folder}/db" root ${PIWIK_MYSQL_ROOT_PASSWORD}
+
+cecho "Backing up files" $magenta
+create_folder_if_not_exists "${piwik_backup_folder}/data"
+cp -r "${ABSOLUTE_PATH}/../data/piwik/config" "${piwik_backup_folder}/data/config"
+cp "${ABSOLUTE_PATH}/../ssmtp.conf" "${piwik_backup_folder}/data/ssmtp.conf"
+cp "${ABSOLUTE_PATH}/../revaliases" "${piwik_backup_folder}/data/revaliases"
+
+create_folder_if_not_exists "${piwik_backup_folder}/data/config"
+
+cecho "Backing up environment" $magenta
+
+echo "PIWIK_MYSQL_ROOT_PASSWORD=${PIWIK_MYSQL_ROOT_PASSWORD}">> "${piwik_backup_folder}/env.txt"
+
+
+cecho "Create a tarball with all data" $cyan
+
+current_directory=$(pwd)
+
+tar_file="${backup_folder}/../backup_${now}.tar.gz"
+
+tar -czf ${tar_file} -C ${backup_folder} ${backup_folder}
+
+cd ${current_directory}
+
+cecho "The data sucessfully backed up as" $green
+cecho $tar_file $blue
