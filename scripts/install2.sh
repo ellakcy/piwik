@@ -10,6 +10,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 
 SCRIPT_PATH="$( cd -P "$( dirname "$SOURCE" )" && pwd )"/..
+DOCKER_COMPOSE_YML_PATH="${SCRIPT_PATH}/docker-compose.yml"
 
 # Printing functions
 black='\E[30;40m'
@@ -38,6 +39,11 @@ color=${2:-$black}           # Defaults to black, if not specified.
 
   return
 }
+
+cecho "Installation script for piwik + wordpress solution" $magenta
+
+cecho "Deleting Data for a fresh install" $red
+sudo rm -rf "${SCRIPT_PATH}/data"
 
 cecho "Setting Up Piwik" $magenta
 cecho "Configuring piwik database settings" $cyan
@@ -85,23 +91,37 @@ read -p "Insert a password for the WORDPRESS' admin user: " WORDPRESS_ADMIN_PASS
 read -p "Insert a your site's url: " WORDPRESS_URL
 
 
-COMMAND="env PIWIK_MYSQL_ROOT_PASSWORD=\"${PIWIK_MYSQL_ROOT_PASSWORD}\" WORDPRESS_MYSQL_ROOT_PASSWORD=\"${WORDPRESS_MYSQL_ROOT_PASSWORD}\" WORDPRESS_MYSQL_USER=\"${WORDPRESS_MYSQL_USER}\" WORDPRESS_MYSQL_PASSWORD=\"${WORDPRESS_MYSQL_PASSWORD}\" WORDPRESS_ADMIN_USER=\"${WORDPRESS_ADMIN_USER}\" WORDPRESS_ADMIN_PASSWORD=\"${WORDPRESS_ADMIN_PASSWORD}\" WORDPRESS_URL=\"${WORDPRESS_URL}\" docker-compose"
+ENV_COMMAND="env PIWIK_MYSQL_ROOT_PASSWORD=\"${PIWIK_MYSQL_ROOT_PASSWORD}\" \\
+             WORDPRESS_MYSQL_ROOT_PASSWORD=\"${WORDPRESS_MYSQL_ROOT_PASSWORD}\" \\
+             WORDPRESS_MYSQL_USER=\"${WORDPRESS_MYSQL_USER}\" \\
+             WORDPRESS_MYSQL_PASSWORD=\"${WORDPRESS_MYSQL_PASSWORD}\" \\
+             WORDPRESS_ADMIN_USER=\"${WORDPRESS_ADMIN_USER}\" \\
+             WORDPRESS_ADMIN_PASSWORD=\"${WORDPRESS_ADMIN_PASSWORD}\" \\
+             WORDPRESS_URL=\"${WORDPRESS_URL}\""
+
+COMMAND="${ENV_COMMAND} docker-compose -f ${DOCKER_COMPOSE_YML_PATH}"
 
 STARTUP_SCRIPT_PATH="${SCRIPT_PATH}/start.sh"
 STOP_SCRIPT_PATH="${SCRIPT_PATH}/stop.sh"
+BACKUP_SCRIPT_PATH="${SCRIPT_PATH}/backup.sh"
 
-echo $COMMAND" up -d" > ${STARTUP_SCRIPT_PATH}
+echo "${COMMAND} up -d" > ${STARTUP_SCRIPT_PATH}
 chmod u+x ${STARTUP_SCRIPT_PATH}
-
 cecho "Startup script generated" $green
 
 echo $COMMAND" stop " > ${STOP_SCRIPT_PATH}
 chmod u+x ${STOP_SCRIPT_PATH}
-
 cecho "Stop script generated" $green
 
-echo "In order to start up the service run: "
+echo "${ENV_COMMAND} ${SCRIPT_PATH}/scripts/pre-backup" > ${BACKUP_SCRIPT_PATH}
+chmod u+x ${BACKUP_SCRIPT_PATH}
+cecho "Backup script generated" $green
+
+echo "In order to start up the containers run: "
 cecho "${STARTUP_SCRIPT_PATH}" $green
 
-echo "You can stop the services via:"
+echo "You can stop the containers via:"
 cecho "${STOP_SCRIPT_PATH}" $green
+
+echo "You can perform a full backup via:"
+cecho "sudo ${BACKUP_SCRIPT_PATH}" $green
