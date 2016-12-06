@@ -23,3 +23,9 @@ And you stop with:
 ./stop.sh
 
 ``````
+
+Also you can perform a backup by running:
+
+```
+./backup.sh
+```
