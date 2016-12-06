@@ -136,16 +136,10 @@ cecho "Backing up environment" $magenta
 
 echo "PIWIK_MYSQL_ROOT_PASSWORD=${PIWIK_MYSQL_ROOT_PASSWORD}">> "${piwik_backup_folder}/env.txt"
 
-
 cecho "Create a tarball with all data" $cyan
 
-current_directory=$(pwd)
-
 tar_file="${backup_folder}/../backup_${now}.tar.gz"
-
-tar -czf ${tar_file} -C ${backup_folder} ${backup_folder}
-
-cd ${current_directory}
+tar -czvf ${tar_file} -C ${backup_folder} ./
 
 cecho "The data sucessfully backed up as" $green
 cecho $tar_file $blue
