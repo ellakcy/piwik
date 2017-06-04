@@ -9,4 +9,4 @@ done
 
 SCRIPT_PATH="$( cd -P "$( dirname "$SOURCE" )" && pwd )"/..
 
-grep -o -P "(\w*_?)*=(\"|\').*(\"|\')" ${SCRIPT_PATH}/start.sh > ${SCRIPT_PATH}/.env
+grep -o -P "(\w*_?)*=(\"|\').*(\"|\')" ${SCRIPT_PATH}/start.sh > ${SCRIPT_PATH}/run.env
