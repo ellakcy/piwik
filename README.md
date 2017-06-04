@@ -24,8 +24,17 @@ And you stop with:
 
 ``````
 
-Also you can perform a backup by running:
+Also you can perform a backup by running (for now does not work to be improved):
 
 ```
 ./backup.sh
+```
+
+## Migrating from previous installation
+
+Just run:
+
+```
+cd ^path that you cloned your project^
+./scripts/migrate_to_env_file.sh
 ```
