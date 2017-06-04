@@ -9,4 +9,5 @@ done
 
 SCRIPT_PATH="$( cd -P "$( dirname "$SOURCE" )" && pwd )"/..
 
-grep -o -P "(\w*_?)*=(\"|\').*(\"|\')" ${SCRIPT_PATH}/start.sh > ${SCRIPT_PATH}/run.env
+# https://stackoverflow.com/questions/44355112/bash-replace-character-into-separated-values
+grep -o -P "(\w*_?)*=(\"|\').*(\"|\')" ${SCRIPT_PATH}/start.sh | sed 's/"//g' > ${SCRIPT_PATH}/run.env
