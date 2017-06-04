@@ -99,12 +99,12 @@ WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER}
 WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}
 WORDPRESS_URL=${WORDPRESS_URL}"
 
-ENV_FILE="${SCRIPT_PATH}/run.env"
+ENV_FILE="${SCRIPT_PATH}/.env"
 
 cecho "Generating Enviromental variables file: " $magenta
 echo "${ENV_COMMAND}" > ${ENV_FILE}
 if [ -f ${ENV_FILE} ]; then
-  cecho "File ${SCRIPT_PATH} generated" $green
+  cecho "File ${ENV_FILE} generated" $green
 fi
 
 COMMAND="docker-compose -f ${DOCKER_COMPOSE_YML_PATH}"
