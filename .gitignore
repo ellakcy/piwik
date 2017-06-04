@@ -7,3 +7,4 @@ start.sh
 stop.sh
 backup.sh
 backup
+.env
