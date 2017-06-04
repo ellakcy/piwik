@@ -9,3 +9,4 @@ backup.sh
 backup
 .env
 run.env
+*.bak

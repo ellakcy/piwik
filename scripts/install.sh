@@ -121,7 +121,7 @@ echo $COMMAND" stop " > ${STOP_SCRIPT_PATH}
 chmod u+x ${STOP_SCRIPT_PATH}
 cecho "Stop script generated" $green
 
-echo "${ENV_COMMAND} ${SCRIPT_PATH}/scripts/pre-backup" > ${BACKUP_SCRIPT_PATH}
+echo "env ${ENV_COMMAND} ${SCRIPT_PATH}/scripts/pre-backup" > ${BACKUP_SCRIPT_PATH}
 chmod u+x ${BACKUP_SCRIPT_PATH}
 cecho "Backup script generated" $green
 
