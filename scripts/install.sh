@@ -48,7 +48,7 @@ sudo rm -rf "${SCRIPT_PATH}/data"
 cecho "Setting Up Piwik" $magenta
 cecho "Configuring piwik database settings" $cyan
 
-read -p "Instert a password for piwik's database: " PIWIK_MYSQL_ROOT_PASSWORD
+read -p "Insert a password for piwik's database: " PIWIK_MYSQL_ROOT_PASSWORD
 
 cecho "Configuring Email settings for reports." $cyan
 
@@ -92,18 +92,20 @@ read -p "Insert a your site's url: " WORDPRESS_URL
 
 
 ENV_COMMAND="PIWIK_MYSQL_ROOT_PASSWORD=${PIWIK_MYSQL_ROOT_PASSWORD}
-             WORDPRESS_MYSQL_ROOT_PASSWORD=${WORDPRESS_MYSQL_ROOT_PASSWORD}
-             WORDPRESS_MYSQL_USER=${WORDPRESS_MYSQL_USER}
-             WORDPRESS_MYSQL_PASSWORD=${WORDPRESS_MYSQL_PASSWORD}
-             WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER}
-             WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}
-             WORDPRESS_URL=${WORDPRESS_URL}"
+WORDPRESS_MYSQL_ROOT_PASSWORD=${WORDPRESS_MYSQL_ROOT_PASSWORD}
+WORDPRESS_MYSQL_USER=${WORDPRESS_MYSQL_USER}
+WORDPRESS_MYSQL_PASSWORD=${WORDPRESS_MYSQL_PASSWORD}
+WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER}
+WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}
+WORDPRESS_URL=${WORDPRESS_URL}"
 
-ENV_FILE= ${SCRIPT_PATH}/run.env
+ENV_FILE="${SCRIPT_PATH}/run.env"
 
 cecho "Generating Enviromental variables file: " $magenta
-echo ${ENV_COMMAND} > ${ENV_FILE}
-cecho "File ${SCRIPT_PATH} generated" $green
+echo "${ENV_COMMAND}" > ${ENV_FILE}
+if [ -f ${ENV_FILE} ]; then
+  cecho "File ${SCRIPT_PATH} generated" $green
+fi
 
 COMMAND="docker-compose -f ${DOCKER_COMPOSE_YML_PATH}"
 
